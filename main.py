@@ -110,3 +110,83 @@ HTML = """<!DOCTYPE html>
     border: 1px solid var(--border);
     padding: 16px;
   }
+  
+  
+  .preview-title {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--dim);
+    letter-spacing: 0.12em;
+    margin-bottom: 12px;
+  }
+
+  .preview-tree { font-size: 12px; line-height: 2; }
+  .preview-tree .project-name { color: var(--text); font-weight: 600; }
+  .preview-tree .folder { color: var(--accent); padding-left: 16px; }
+
+  .btn {
+    width: 100%;
+    background: var(--accent);
+    color: #111;
+    border: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn:hover { background: #f0b84a; }
+  .btn:active { background: var(--accent-dim); }
+
+  .status {
+    font-size: 11px;
+    text-align: center;
+    min-height: 18px;
+    letter-spacing: 0.04em;
+  }
+
+  .status.success { color: var(--success); }
+  .status.error   { color: var(--error); }
+
+  .card-footer {
+    padding: 14px 32px;
+    border-top: 1px solid var(--border);
+    font-size: 9px;
+    color: var(--dim);
+    text-align: center;
+    letter-spacing: 0.06em;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="card-header">
+    <h1>RESOLVE</h1>
+    <p>Project Organizer</p>
+  </div>
+
+  <div class="card-body">
+    <div class="field">
+      <label>NOME DO PROJETO</label>
+      <input type="text" id="projectName" placeholder="Ex: Campanha_ClienteX" autofocus>
+    </div>
+
+    <div class="field">
+      <label>CAMINHO DESTINO</label>
+      <input type="text" id="destPath" placeholder="Ex: /Users/christian/Projetos">
+    </div>
+
+    <div class="preview">
+      <div class="preview-title">ESTRUTURA QUE SERÁ CRIADA</div>
+      <div class="preview-tree" id="tree">
+        <div class="project-name">📁 Nome_do_Projeto/</div>
+        <div class="folder">├─ Footage/</div>
+        <div class="folder">├─ Audio/</div>
+        <div class="folder">├─ Export/</div>
+        <div class="folder">├─ Graphics/</div>
+        <div class="folder">└─ Project/</div>
+      </div>
+    </div>
