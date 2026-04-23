@@ -24,7 +24,7 @@ HTML = """<!DOCTYPE html>
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-:root {
+  :root {
     --bg: #141414;
     --surface: #1e1e1e;
     --border: #2e2e2e;
@@ -59,7 +59,7 @@ HTML = """<!DOCTYPE html>
     padding: 28px 32px 22px;
     border-bottom: 1px solid var(--border);
   }
-  
+
   .card-header h1 {
     font-size: 22px;
     font-weight: 700;
@@ -110,8 +110,7 @@ HTML = """<!DOCTYPE html>
     border: 1px solid var(--border);
     padding: 16px;
   }
-  
-  
+
   .preview-title {
     font-size: 9px;
     font-weight: 700;
@@ -190,3 +189,69 @@ HTML = """<!DOCTYPE html>
         <div class="folder">└─ Project/</div>
       </div>
     </div>
+
+    <button class="btn" onclick="criar()">CRIAR PROJETO</button>
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="card-footer">localhost:8765 — feche o terminal para encerrar</div>
+</div>
+
+<script>
+  const nameInput = document.getElementById('projectName');
+
+  nameInput.addEventListener('input', () => {
+    const n = nameInput.value.trim() || 'Nome_do_Projeto';
+    document.getElementById('tree').innerHTML = `
+      <div class="project-name">📁 ${n}/</div>
+      <div class="folder">├─ Footage/</div>
+      <div class="folder">├─ Audio/</div>
+      <div class="folder">├─ Export/</div>
+      <div class="folder">├─ Graphics/</div>
+      <div class="folder">└─ Project/</div>
+    `;
+  });
+
+  async function criar() {
+    const name = document.getElementById('projectName').value.trim();
+    const dest = document.getElementById('destPath').value.trim();
+
+    if (!name) { setStatus('⚠ Digite o nome do projeto.', 'error'); return; }
+    if (!dest) { setStatus('⚠ Digite o caminho de destino.', 'error'); return; }
+
+    setStatus('…', '');
+
+    const res = await fetch('/criar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, dest })
+    });
+
+    const data = await res.json();
+    if (data.ok) {
+      setStatus('✓ ' + data.msg, 'success');
+      document.getElementById('projectName').value = '';
+      document.getElementById('tree').innerHTML = `
+        <div class="project-name">📁 Nome_do_Projeto/</div>
+        <div class="folder">├─ Footage/</div>
+        <div class="folder">├─ Audio/</div>
+        <div class="folder">├─ Export/</div>
+        <div class="folder">├─ Graphics/</div>
+        <div class="folder">└─ Project/</div>
+      `;
+    } else {
+      setStatus('⚠ ' + data.msg, 'error');
+    }
+  }
+
+  function setStatus(msg, cls) {
+    const s = document.getElementById('status');
+    s.textContent = msg;
+    s.className = 'status ' + (cls || '');
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') criar(); });
+</script>
+</body>
+</html>
+"""
