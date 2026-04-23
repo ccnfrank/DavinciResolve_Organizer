@@ -255,3 +255,69 @@ HTML = """<!DOCTYPE html>
 </body>
 </html>
 """
+
+
+class Handler(http.server.BaseHTTPRequestHandler):
+    def log_message(self, format, *args):
+        pass  # silencia logs no terminal
+
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.end_headers()
+        self.wfile.write(HTML.encode())
+
+    def do_POST(self):
+        if self.path != "/criar":
+            self.send_response(404)
+            self.end_headers()
+            return
+
+        length = int(self.headers.get("Content-Length", 0))
+        body = json.loads(self.rfile.read(length))
+
+        name = body.get("name", "").strip()
+        dest = body.get("dest", "").strip()
+        result = {"ok": False, "msg": ""}
+
+        if not name:
+            result["msg"] = "Nome do projeto está vazio."
+        elif not dest:
+            result["msg"] = "Caminho de destino está vazio."
+        elif not os.path.isdir(dest):
+            result["msg"] = f"Diretório não encontrado: {dest}"
+        else:
+            project_path = os.path.join(dest, name)
+            if os.path.exists(project_path):
+                result["msg"] = f"Já existe uma pasta chamada '{name}' nesse destino."
+            else:
+                try:
+                    os.makedirs(project_path)
+                    for folder in SUBFOLDERS:
+                        os.makedirs(os.path.join(project_path, folder))
+                    result["ok"] = True
+                    result["msg"] = f"Projeto '{name}' criado em {dest}"
+                except Exception as e:
+                    result["msg"] = str(e)
+
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+        self.wfile.write(json.dumps(result).encode())
+
+
+def main():
+    server = http.server.HTTPServer(("localhost", PORT), Handler)
+    url = f"http://localhost:{PORT}"
+    print(f"✓ Resolve Organizer rodando em {url}")
+    print("  Abrindo navegador automaticamente...")
+    print("  Para encerrar: Ctrl+C\n")
+    threading.Timer(0.5, lambda: webbrowser.open(url)).start()
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print("\n✓ Encerrado.")
+
+
+if __name__ == "__main__":
+    main()
